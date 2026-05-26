@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Калькулятор Лонсурф®</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./Calculator.css?v=8" />
+<style>
+  html { scrollbar-gutter: stable; }
+  body {
+    margin: 0;
+    background: #FFFFFF;
+    font-family: 'Montserrat', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px 0;
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <div id="calculator"></div>
+</main>
+<script src="./Calculator.js?v=8"></script>
+<script>renderCalculator(document.getElementById('calculator'));</script>
+</body>
+</html>
