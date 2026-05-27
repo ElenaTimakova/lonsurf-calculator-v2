@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'node:path';
 
 export default defineConfig({
-  base: '/lonsurf-calculator/',
+  base: '/lonsurf-calculator-v2/',
   plugins: [react()],
   resolve: {
     alias: {
