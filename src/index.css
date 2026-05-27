@@ -1,0 +1,10 @@
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  margin: 0;
+  background: #ffffff;
+  font-family: 'Montserrat', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

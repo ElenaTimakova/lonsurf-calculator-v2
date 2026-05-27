@@ -1,6 +1,11 @@
 .DS_Store
 Thumbs.db
 node_modules/
+dist/
+excel_dump.txt
+excel_test.json
+bsa_test.json
+renal_stats.json
 .idea/
 .vscode/
 *.log
