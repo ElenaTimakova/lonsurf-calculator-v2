@@ -5,7 +5,17 @@ import {
   validateField,
   validateForm,
 } from './calculatorLogic';
-import { INITIAL_FORM, REQUIRED_FIELDS, RENAL_OPTIONS } from './constants';
+import {
+  COURSE_DURATION_LABEL,
+  DOSAGE_REGIMEN_NOTE_AFTER,
+  DOSAGE_REGIMEN_NOTE_BEFORE,
+  DOSAGE_REGIMEN_NOTE_HIGHLIGHT,
+  IMPOSSIBLE_EXPLANATION,
+  IMPOSSIBLE_TITLE,
+  INITIAL_FORM,
+  REQUIRED_FIELDS,
+  RENAL_OPTIONS,
+} from './constants';
 import styles from './Calculator.module.css';
 import type {
   CalculationSuccess,
@@ -145,20 +155,20 @@ function EmptyState() {
       </div>
       <p className="lc-empty__text">
         Введите параметры пациента — калькулятор рассчитает рекомендованную стартовую дозу,
-        разбивку приёмов и количество упаковок на курс.
+        разбивку приёмов и количество упаковок на выбранное число циклов.
       </p>
     </div>
   );
 }
 
-function ImpossibleState({ reason }: { reason: string }) {
+function ImpossibleState({ text }: { text: string }) {
   return (
     <div className="lc-impossible">
-      <div className="lc-impossible__icon">!</div>
-      <div className="lc-impossible__body">
-        <h4>Невозможно рассчитать дозу для выбранных параметров</h4>
-        <p>{reason}</p>
+      <div className="lc-impossible__icon" aria-hidden="true">
+        !
       </div>
+      <h4 className="lc-impossible__title">{IMPOSSIBLE_TITLE}</h4>
+      <p className="lc-impossible__text">{text}</p>
     </div>
   );
 }
@@ -167,7 +177,7 @@ function PackCard({ pack }: { pack: CalculationSuccess['packs'][number] }) {
   return (
     <MetricCard
       label={pack.label}
-      value={formatNumber(pack.raw, 1)}
+      value={formatNumber(pack.exact, 1)}
       unit="шт"
       extra={
         <div className="lc-metric__rounded">
@@ -190,7 +200,7 @@ function PacksSection({ packs }: { packs: CalculationSuccess['packs'] }) {
       <div className="lc-section__head">
         <h3 className="lc-section__title">Количество упаковок</h3>
         <p className="lc-section__hint">
-          На курс достаточно <strong>одного</strong> из вариантов комплектации
+          На выбранное число циклов достаточно <strong>одного</strong> из вариантов комплектации
         </p>
       </div>
 
@@ -249,9 +259,9 @@ export function Calculator({ className = '' }: CalculatorProps) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [view, setView] = useState<CalculatorView>('initial');
   const [result, setResult] = useState<CalculationSuccess | null>(null);
-  const [reason, setReason] = useState<string | null>(null);
-
+  const [impossibleReason, setImpossibleReason] = useState(IMPOSSIBLE_EXPLANATION);
   const anyValue = REQUIRED_FIELDS.some((field) => Boolean(values[field]));
+  const isFormLocked = view === 'success';
 
   const setField = (name: CalculatorField) => (value: string) => {
     setValues((prev) => ({ ...prev, [name]: value }));
@@ -281,14 +291,13 @@ export function Calculator({ className = '' }: CalculatorProps) {
     setErrors({});
     const calculation = computeDose(values);
     if (calculation.impossible) {
-      setReason(calculation.reason);
       setResult(null);
+      setImpossibleReason(calculation.reason);
       setView('impossible');
       return;
     }
 
     setResult(calculation);
-    setReason(null);
     setView('success');
 
     if (window.matchMedia('(max-width: 768px)').matches) {
@@ -302,7 +311,7 @@ export function Calculator({ className = '' }: CalculatorProps) {
     setValues(INITIAL_FORM);
     setErrors({});
     setResult(null);
-    setReason(null);
+    setImpossibleReason(IMPOSSIBLE_EXPLANATION);
     setView('initial');
   };
 
@@ -317,7 +326,11 @@ export function Calculator({ className = '' }: CalculatorProps) {
 
       <div className="lc__layout">
         <div className="lc__col">
-          <form className="lc-form" onSubmit={onSubmit} noValidate>
+          <form
+            className={`lc-form${isFormLocked ? ' is-locked' : ''}`}
+            onSubmit={onSubmit}
+            noValidate
+          >
             <div className="lc-form__fields">
               <Field id="weight" label="Вес" unit="кг" error={errors.weight}>
                 <input
@@ -329,6 +342,7 @@ export function Calculator({ className = '' }: CalculatorProps) {
                   autoComplete="off"
                   placeholder="Например, 70"
                   value={values.weight}
+                  disabled={isFormLocked}
                   onChange={(e) => setField('weight')(e.target.value)}
                   onBlur={onFieldBlur('weight')}
                 />
@@ -344,6 +358,7 @@ export function Calculator({ className = '' }: CalculatorProps) {
                   autoComplete="off"
                   placeholder="Например, 180"
                   value={values.height}
+                  disabled={isFormLocked}
                   onChange={(e) => setField('height')(e.target.value)}
                   onBlur={onFieldBlur('height')}
                 />
@@ -355,6 +370,7 @@ export function Calculator({ className = '' }: CalculatorProps) {
                   id="renal"
                   name="renal"
                   value={values.renal}
+                  disabled={isFormLocked}
                   onChange={(e) => setField('renal')(e.target.value)}
                   onBlur={onFieldBlur('renal')}
                 >
@@ -367,7 +383,7 @@ export function Calculator({ className = '' }: CalculatorProps) {
                 </select>
               </Field>
 
-              <Field id="days" label="Ожидаемая длительность курса" unit="дней" error={errors.days}>
+              <Field id="days" label={COURSE_DURATION_LABEL} error={errors.days}>
                 <input
                   className="lc-field__input"
                   id="days"
@@ -375,19 +391,31 @@ export function Calculator({ className = '' }: CalculatorProps) {
                   type="text"
                   inputMode="numeric"
                   autoComplete="off"
-                  placeholder="Например, 28"
+                  placeholder="Например, 1"
                   value={values.days}
+                  disabled={isFormLocked}
                   onChange={(e) => setField('days')(e.target.value)}
                   onBlur={onFieldBlur('days')}
                 />
               </Field>
             </div>
 
+            <p className="lc-form__note">
+              {DOSAGE_REGIMEN_NOTE_BEFORE}
+              <strong>{DOSAGE_REGIMEN_NOTE_HIGHLIGHT}</strong>
+              {DOSAGE_REGIMEN_NOTE_AFTER}
+            </p>
+
             <div className="lc__actions">
-              <button type="button" className="lc-btn lc-btn--ghost" onClick={onReset} disabled={!anyValue}>
+              <button
+                type="button"
+                className={`lc-btn lc-btn--ghost${isFormLocked ? ' lc-btn--reset-prominent' : ''}`}
+                onClick={onReset}
+                disabled={!isFormLocked && !anyValue}
+              >
                 Сбросить
               </button>
-              <button type="submit" className="lc-btn lc-btn--primary">
+              <button type="submit" className="lc-btn lc-btn--primary" disabled={isFormLocked}>
                 Рассчитать дозу
               </button>
             </div>
@@ -397,7 +425,7 @@ export function Calculator({ className = '' }: CalculatorProps) {
 
         <div className="lc__col">
           {view === 'success' && result && <ResultPanel result={result} />}
-          {view === 'impossible' && reason && <ImpossibleState reason={reason} />}
+          {view === 'impossible' && <ImpossibleState text={impossibleReason} />}
           {view === 'initial' && <EmptyState />}
         </div>
       </div>

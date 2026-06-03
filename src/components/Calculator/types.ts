@@ -18,10 +18,47 @@ export type PackSku = {
   pack: 20 | 60;
 };
 
-export type PackResult = PackSku & {
-  raw: number;
+export type PackAmount = {
+  exact: number;
   rounded: number;
 };
+
+export type PackResult = PackSku & PackAmount;
+
+export type CalculatorTablets = {
+  morning: { tablet15mg: number; tablet20mg: number };
+  evening: { tablet15mg: number; tablet20mg: number };
+};
+
+export type CalculatorPackages = {
+  pack15mg20: PackAmount;
+  pack20mg20: PackAmount;
+  pack15mg60: PackAmount;
+  pack20mg60: PackAmount;
+};
+
+export type CalculatorInput = {
+  weightKg: number;
+  heightCm: number;
+  renalFunction: string;
+  cycles: number;
+};
+
+export type CalculatorSuccessResult = {
+  bsa: number;
+  singleDose: number;
+  dailyDose: number;
+  morningDose: number;
+  eveningDose: number;
+  tablets: CalculatorTablets;
+  packages: CalculatorPackages;
+};
+
+export type CalculatorErrorResult = {
+  error: string;
+};
+
+export type CalculatorResult = CalculatorSuccessResult | CalculatorErrorResult;
 
 export type LookupRow = {
   key: string;

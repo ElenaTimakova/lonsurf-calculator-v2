@@ -111,6 +111,19 @@
   flex: 0 0 auto;
 }
 
+.root :global(.lc-form__note) {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-style: italic;
+  line-height: 150%;
+  color: var(--grey-text);
+}
+
+.root :global(.lc-form__note strong) {
+  font-weight: 700;
+  font-style: italic;
+}
+
 .root :global(.lc-form__spacer) {
   flex: 1 1 auto;
   min-height: 0;
@@ -160,6 +173,20 @@
 .root :global(.lc-field__input::placeholder) {
   color: #a8a39a;
   font-weight: 400;
+}
+
+.root :global(.lc-field__input:disabled),
+.root :global(.lc-field__select:disabled) {
+  background-color: var(--cream);
+  color: var(--grey-text);
+  border-color: var(--grey-line-strong);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.root :global(.lc-field__input:disabled:hover),
+.root :global(.lc-field__select:disabled:hover) {
+  border-color: var(--grey-line-strong);
 }
 
 .root :global(.lc-field__input:hover),
@@ -281,6 +308,25 @@
   background: transparent;
   color: var(--grey-icon);
   cursor: not-allowed;
+}
+
+.root :global(.lc-btn--reset-prominent) {
+  background: var(--white);
+  border: 2px solid var(--orange);
+  box-shadow: var(--shadow-button);
+  font-weight: 700;
+  color: var(--black);
+}
+
+.root :global(.lc-btn--reset-prominent:hover) {
+  background: var(--grad-sun);
+  border-color: var(--orange);
+  transform: translateY(-1px);
+  filter: saturate(1.1);
+}
+
+.root :global(.lc-btn--reset-prominent:active) {
+  transform: translateY(0);
 }
 
 .root :global(.lc-empty) {
@@ -529,43 +575,50 @@
 }
 
 .root :global(.lc-impossible) {
-  background: linear-gradient(135deg, #fff5e6 0%, #ffe3cc 100%);
-  border: 1.5px solid #ffd89d;
+  background: var(--white);
   border-radius: var(--r-card);
-  padding: 32px;
+  padding: 40px 32px;
   display: flex;
-  gap: 20px;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   height: 100%;
+  gap: 16px;
 }
 
 .root :global(.lc-impossible__icon) {
-  flex: 0 0 56px;
+  flex-shrink: 0;
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--white);
+  background: var(--cream);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 28px;
   font-weight: 800;
+  line-height: 1;
   color: var(--orange-accent);
 }
 
-.root :global(.lc-impossible__body h4) {
+.root :global(.lc-impossible__title) {
   font-size: 20px;
   font-weight: 700;
-  margin: 0 0 8px;
+  margin: 0;
   color: var(--black);
   line-height: 130%;
+  text-align: center;
+  max-width: 420px;
 }
 
-.root :global(.lc-impossible__body p) {
+.root :global(.lc-impossible__text) {
   font-size: 14px;
   line-height: 150%;
   color: var(--grey-text);
   margin: 0;
+  text-align: center;
+  max-width: 360px;
 }
 
 @media (max-width: 1280px) {

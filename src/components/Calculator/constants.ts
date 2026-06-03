@@ -11,7 +11,6 @@ export const INITIAL_FORM: CalculatorFormValues = {
 
 export const REQUIRED_MSG = 'Поле обязательно для заполнения';
 export const NUMBER_MSG = 'Введите число, например, 80';
-export const WEIGHT_MAX_MSG = 'Вес должен быть не более 150 кг';
 
 export const RENAL_OPTIONS: Array<{
   value: RenalValue;
@@ -24,6 +23,21 @@ export const RENAL_OPTIONS: Array<{
   { value: 'severe', label: 'Тяжёлая степень', excelLabel: 'Тяжелая степень ' },
 ];
 
+/** Дней приёма в одном 28-дневном цикле (дни 1–5 и 8–12), по Excel */
+export const TREATMENT_DAYS_PER_CYCLE = 10;
+
+export const COURSE_DURATION_LABEL =
+  'Ожидаемая длительность курса терапии, число циклов / месяцев';
+
+export const DOSAGE_REGIMEN_NOTE_BEFORE =
+  'Для взрослых пациентов рекомендованная начальная доза Лонсурфа в качестве монотерапии или в комбинации с бевацизумабом составляет 35 мг/м² площади поверхности тела (ППТ) на приём перорально 2 раза в сутки ';
+
+export const DOSAGE_REGIMEN_NOTE_HIGHLIGHT =
+  'с 1 по 5 день и с 8 по 12 день (всего 10 дней) каждого 28-дневного цикла';
+
+export const DOSAGE_REGIMEN_NOTE_AFTER =
+  ', до прогрессирования заболевания или до развития неприемлемых явлений токсичности.';
+
 export const PACK_SKUS: PackSku[] = [
   { key: 'lon-15-20', label: 'Лонсурф® 15 мг №20', dosage: 15, pack: 20 },
   { key: 'lon-20-20', label: 'Лонсурф® 20 мг №20', dosage: 20, pack: 20 },
@@ -31,5 +45,9 @@ export const PACK_SKUS: PackSku[] = [
   { key: 'lon-20-60', label: 'Лонсурф® 20 мг №60', dosage: 20, pack: 60 },
 ];
 
-export const IMPOSSIBLE_LOOKUP_MSG =
-  'Невозможно рассчитать дозу для выбранных параметров. Скорректируйте вес, рост или степень почечной недостаточности.';
+export const IMPOSSIBLE_TITLE = 'Невозможно рассчитать дозу для выбранных параметров';
+
+export const IMPOSSIBLE_EXPLANATION = 'Скорректируйте вес или рост для корректного расчета';
+
+export const BSA_NOT_IN_TABLE_ERROR =
+  'Рассчитанная площадь поверхности тела выходит за пределы диапазона, предусмотренного таблицей дозировок. Проверьте введенные данные или обратитесь к специалисту.';

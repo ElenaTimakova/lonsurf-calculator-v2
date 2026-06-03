@@ -1,19 +1,25 @@
 import lookupTable from './lookupTable.json';
 import {
-  IMPOSSIBLE_LOOKUP_MSG,
+  BSA_NOT_IN_TABLE_ERROR,
+  IMPOSSIBLE_EXPLANATION,
   NUMBER_MSG,
   PACK_SKUS,
   REQUIRED_FIELDS,
   REQUIRED_MSG,
   RENAL_OPTIONS,
-  WEIGHT_MAX_MSG,
+  TREATMENT_DAYS_PER_CYCLE,
 } from './constants';
 import type {
   CalculationResult,
   CalculatorField,
   CalculatorFormValues,
+  CalculatorInput,
+  CalculatorPackages,
+  CalculatorResult,
+  CalculatorSuccessResult,
   FieldErrors,
   LookupRow,
+  PackAmount,
   RenalValue,
 } from './types';
 
@@ -21,11 +27,11 @@ const LOOKUP_ROWS = lookupTable as LookupRow[];
 
 const lookupMap = new Map<string, LookupRow>();
 for (const row of LOOKUP_ROWS) {
-  lookupMap.set(`${row.bsa}|${row.renal}`, row);
+  lookupMap.set(`${row.bsa}|${row.renal.trim()}`, row);
 }
 
 const renalByValue = new Map<RenalValue, string>(
-  RENAL_OPTIONS.map((option) => [option.value, option.excelLabel]),
+  RENAL_OPTIONS.map((option) => [option.value, option.excelLabel.trim()]),
 );
 
 /** ППТ по формуле из Excel: ROUNDDOWN(0.007184 * вес^0.425 * рост^0.725, 2) */
@@ -52,7 +58,6 @@ export function validateField(name: CalculatorField, raw: string): string | null
   if (!/^\d+([.,]\d+)?$/.test(value)) return NUMBER_MSG;
 
   const numeric = parseNumber(value);
-  if (name === 'weight' && numeric > 150) return WEIGHT_MAX_MSG;
   if (name === 'days' && (!Number.isInteger(numeric) || numeric <= 0)) {
     return NUMBER_MSG;
   }
@@ -69,55 +74,134 @@ export function validateForm(values: CalculatorFormValues): FieldErrors {
   return errors;
 }
 
-function findLookupRow(bsa: number, renalValue: RenalValue): LookupRow | null {
-  const renalLabel = renalByValue.get(renalValue);
-  if (!renalLabel) return null;
-  return lookupMap.get(`${bsa}|${renalLabel}`) ?? null;
+function findLookupRow(bsa: number, renalLabel: string): LookupRow | null {
+  return lookupMap.get(`${bsa}|${renalLabel.trim()}`) ?? null;
 }
 
-function calcPacks(
-  days: number,
+function roundPackAmount(exact: number): number {
+  return exact === 0 ? 0 : Math.ceil(exact);
+}
+
+function calcPackAmounts(
+  cycles: number,
+  morning: LookupRow['morning'],
+  evening: LookupRow['evening'],
+): CalculatorPackages {
+  const treatmentDays = cycles * TREATMENT_DAYS_PER_CYCLE;
+  const total15 = (morning.p15 + evening.p15) * treatmentDays;
+  const total20 = (morning.p20 + evening.p20) * treatmentDays;
+
+  const pack = (total: number, size: 20 | 60): PackAmount => {
+    const exact = total / size;
+    return { exact, rounded: roundPackAmount(exact) };
+  };
+
+  return {
+    pack15mg20: pack(total15, 20),
+    pack20mg20: pack(total20, 20),
+    pack15mg60: pack(total15, 60),
+    pack20mg60: pack(total20, 60),
+  };
+}
+
+function toSuccessResult(bsa: number, row: LookupRow, cycles: number): CalculatorSuccessResult {
+  return {
+    bsa,
+    singleDose: row.singleDose,
+    dailyDose: row.dailyDose,
+    morningDose: row.morningMg,
+    eveningDose: row.eveningMg,
+    tablets: {
+      morning: { tablet15mg: row.morning.p15, tablet20mg: row.morning.p20 },
+      evening: { tablet15mg: row.evening.p15, tablet20mg: row.evening.p20 },
+    },
+    packages: calcPackAmounts(cycles, row.morning, row.evening),
+  };
+}
+
+/** Чистая функция расчёта по входным параметрам (для unit-тестов и UI). */
+export function calculateCalculatorResult(input: CalculatorInput): CalculatorResult {
+  const { weightKg, heightCm, renalFunction, cycles } = input;
+
+  if (!Number.isFinite(weightKg) || !Number.isFinite(heightCm) || cycles <= 0) {
+    return { error: IMPOSSIBLE_EXPLANATION };
+  }
+
+  const bsa = calcBsa(weightKg, heightCm);
+  const row = findLookupRow(bsa, renalFunction);
+
+  if (!row) {
+    return { error: BSA_NOT_IN_TABLE_ERROR };
+  }
+
+  return toSuccessResult(bsa, row, cycles);
+}
+
+function calcPacksForUi(
+  cycles: number,
   morning: LookupRow['morning'],
   evening: LookupRow['evening'],
 ) {
-  const total15 = (morning.p15 + evening.p15) * days;
-  const total20 = (morning.p20 + evening.p20) * days;
+  const packages = calcPackAmounts(cycles, morning, evening);
+  const byKey: Record<string, PackAmount> = {
+    'lon-15-20': packages.pack15mg20,
+    'lon-20-20': packages.pack20mg20,
+    'lon-15-60': packages.pack15mg60,
+    'lon-20-60': packages.pack20mg60,
+  };
 
-  return PACK_SKUS.map((sku) => {
-    const total = sku.dosage === 15 ? total15 : total20;
-    const exact = total / sku.pack;
-    const raw = roundToDecimals(exact, 1);
-    return { ...sku, raw, rounded: Math.ceil(exact) };
-  });
+  return PACK_SKUS.map((sku) => ({
+    ...sku,
+    exact: byKey[sku.key].exact,
+    rounded: byKey[sku.key].rounded,
+  }));
 }
 
 export function computeDose(values: CalculatorFormValues): CalculationResult {
   const weight = parseNumber(values.weight);
   const height = parseNumber(values.height);
-  const days = parseInt(values.days.replace(',', '.'), 10);
+  const cycles = parseInt(values.days.replace(',', '.'), 10);
   const renalValue = values.renal as RenalValue;
 
   if (!renalByValue.has(renalValue)) {
-    return { impossible: true, reason: 'Не выбрана почечная функция.' };
+    return { impossible: true, reason: IMPOSSIBLE_EXPLANATION };
   }
 
-  const bsa = calcBsa(weight, height);
-  const row = findLookupRow(bsa, renalValue);
+  const result = calculateCalculatorResult({
+    weightKg: weight,
+    heightCm: height,
+    renalFunction: renalByValue.get(renalValue)!,
+    cycles,
+  });
 
-  if (!row) {
-    return { impossible: true, reason: IMPOSSIBLE_LOOKUP_MSG };
+  if ('error' in result) {
+    return { impossible: true, reason: result.error };
   }
+
+  const { tablets } = result;
 
   return {
     impossible: false,
-    bsa,
-    singleDose: row.singleDose,
-    dailyDose: row.dailyDose,
-    morningMg: row.morningMg,
-    eveningMg: row.eveningMg,
-    morning: row.morning,
-    evening: row.evening,
-    packs: calcPacks(days, row.morning, row.evening),
+    bsa: result.bsa,
+    singleDose: result.singleDose,
+    dailyDose: result.dailyDose,
+    morningMg: result.morningDose,
+    eveningMg: result.eveningDose,
+    morning: {
+      p15: tablets.morning.tablet15mg,
+      p20: tablets.morning.tablet20mg,
+    },
+    evening: {
+      p15: tablets.evening.tablet15mg,
+      p20: tablets.evening.tablet20mg,
+    },
+    packs: calcPacksForUi(cycles, {
+      p15: tablets.morning.tablet15mg,
+      p20: tablets.morning.tablet20mg,
+    }, {
+      p15: tablets.evening.tablet15mg,
+      p20: tablets.evening.tablet20mg,
+    }),
   };
 }
 
