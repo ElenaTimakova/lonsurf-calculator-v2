@@ -113,15 +113,13 @@
 
 .root :global(.lc-form__note) {
   margin: 8px 0 0;
-  font-size: 13px;
-  font-style: italic;
+  font-size: 12px;
   line-height: 150%;
   color: var(--grey-text);
 }
 
 .root :global(.lc-form__note strong) {
   font-weight: 700;
-  font-style: italic;
 }
 
 .root :global(.lc-form__spacer) {
@@ -177,8 +175,9 @@
 
 .root :global(.lc-field__input:disabled),
 .root :global(.lc-field__select:disabled) {
-  background-color: var(--cream);
-  color: var(--grey-text);
+  background-color: var(--bg-card);
+  color: rgba(0, 0, 0, 0.5);
+  -webkit-text-fill-color: rgba(0, 0, 0, 0.5);
   border-color: var(--grey-line-strong);
   cursor: not-allowed;
   opacity: 1;
@@ -291,42 +290,40 @@
 }
 
 .root :global(.lc-btn--ghost) {
-  background: transparent;
-  color: var(--black);
+  background: #e5e0d6;
+  color: var(--grey-text);
   box-shadow: none;
   padding: 14px 20px;
   font-weight: 600;
 }
 
 .root :global(.lc-btn--ghost:hover) {
-  background: rgba(0, 0, 0, 0.04);
+  background: #d8d3ca;
   transform: none;
   filter: none;
 }
 
 .root :global(.lc-btn--ghost[disabled]) {
-  background: transparent;
-  color: var(--grey-icon);
+  background: #e5e0d6;
+  color: var(--grey-muted);
   cursor: not-allowed;
 }
 
 .root :global(.lc-btn--reset-prominent) {
-  background: var(--white);
-  border: 2px solid var(--orange);
-  box-shadow: var(--shadow-button);
-  font-weight: 700;
+  background: var(--cream);
   color: var(--black);
+  box-shadow: none;
+  font-weight: 700;
 }
 
 .root :global(.lc-btn--reset-prominent:hover) {
-  background: var(--grad-sun);
-  border-color: var(--orange);
-  transform: translateY(-1px);
-  filter: saturate(1.1);
+  background: #ffeccc;
+  transform: none;
+  filter: none;
 }
 
 .root :global(.lc-btn--reset-prominent:active) {
-  transform: translateY(0);
+  background: var(--cream);
 }
 
 .root :global(.lc-empty) {
