@@ -14,12 +14,14 @@ import {
   IMPOSSIBLE_TITLE,
   INITIAL_FORM,
   REQUIRED_FIELDS,
+  isRenalValue,
   RENAL_OPTIONS,
 } from './constants';
 import styles from './Calculator.module.css';
 import type {
   CalculationSuccess,
   CalculatorField,
+  CalculatorFormValues,
   CalculatorProps,
   CalculatorView,
   FieldErrors,
@@ -263,7 +265,7 @@ export function Calculator({ className = '' }: CalculatorProps) {
   const anyValue = REQUIRED_FIELDS.some((field) => Boolean(values[field]));
   const isFormLocked = view === 'success';
 
-  const setField = (name: CalculatorField) => (value: string) => {
+  const setField = <K extends CalculatorField>(name: K) => (value: CalculatorFormValues[K]) => {
     setValues((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => {
@@ -371,7 +373,10 @@ export function Calculator({ className = '' }: CalculatorProps) {
                   name="renal"
                   value={values.renal}
                   disabled={isFormLocked}
-                  onChange={(e) => setField('renal')(e.target.value)}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setField('renal')(isRenalValue(next) ? next : '');
+                  }}
                   onBlur={onFieldBlur('renal')}
                 >
                   <option value="">Выберите степень функции</option>

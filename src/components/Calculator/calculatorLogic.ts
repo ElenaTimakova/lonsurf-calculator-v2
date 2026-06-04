@@ -1,12 +1,13 @@
 import lookupTable from './lookupTable.json';
 import {
   BSA_NOT_IN_TABLE_ERROR,
+  getRenalLookupKey,
   IMPOSSIBLE_EXPLANATION,
+  isRenalValue,
   NUMBER_MSG,
   PACK_SKUS,
   REQUIRED_FIELDS,
   REQUIRED_MSG,
-  RENAL_OPTIONS,
   TREATMENT_DAYS_PER_CYCLE,
 } from './constants';
 import type {
@@ -20,7 +21,6 @@ import type {
   FieldErrors,
   LookupRow,
   PackAmount,
-  RenalValue,
 } from './types';
 
 const LOOKUP_ROWS = lookupTable as LookupRow[];
@@ -29,10 +29,6 @@ const lookupMap = new Map<string, LookupRow>();
 for (const row of LOOKUP_ROWS) {
   lookupMap.set(`${row.bsa}|${row.renal.trim()}`, row);
 }
-
-const renalByValue = new Map<RenalValue, string>(
-  RENAL_OPTIONS.map((option) => [option.value, option.excelLabel.trim()]),
-);
 
 /** ППТ по формуле из Excel: ROUNDDOWN(0.007184 * вес^0.425 * рост^0.725, 2) */
 export function calcBsa(weightKg: number, heightCm: number): number {
@@ -50,14 +46,21 @@ export function roundToDecimals(value: number, decimals: number): number {
   return Math.round(value * factor) / factor;
 }
 
-export function validateField(name: CalculatorField, raw: string): string | null {
-  const value = raw.trim();
-  if (!value) return REQUIRED_MSG;
-  if (name === 'renal') return null;
+export function validateField(
+  name: CalculatorField,
+  value: CalculatorFormValues[CalculatorField],
+): string | null {
+  if (name === 'renal') {
+    if (!value) return REQUIRED_MSG;
+    return isRenalValue(value) ? null : REQUIRED_MSG;
+  }
 
-  if (!/^\d+([.,]\d+)?$/.test(value)) return NUMBER_MSG;
+  const raw = value.trim();
+  if (!raw) return REQUIRED_MSG;
 
-  const numeric = parseNumber(value);
+  if (!/^\d+([.,]\d+)?$/.test(raw)) return NUMBER_MSG;
+
+  const numeric = parseNumber(raw);
   if (name === 'days' && (!Number.isInteger(numeric) || numeric <= 0)) {
     return NUMBER_MSG;
   }
@@ -128,7 +131,13 @@ export function calculateCalculatorResult(input: CalculatorInput): CalculatorRes
   }
 
   const bsa = calcBsa(weightKg, heightCm);
-  const row = findLookupRow(bsa, renalFunction);
+  const renalLookupKey = getRenalLookupKey(renalFunction);
+
+  if (!renalLookupKey) {
+    return { error: IMPOSSIBLE_EXPLANATION };
+  }
+
+  const row = findLookupRow(bsa, renalLookupKey);
 
   if (!row) {
     return { error: BSA_NOT_IN_TABLE_ERROR };
@@ -161,16 +170,15 @@ export function computeDose(values: CalculatorFormValues): CalculationResult {
   const weight = parseNumber(values.weight);
   const height = parseNumber(values.height);
   const cycles = parseInt(values.days.replace(',', '.'), 10);
-  const renalValue = values.renal as RenalValue;
 
-  if (!renalByValue.has(renalValue)) {
+  if (!values.renal || !isRenalValue(values.renal)) {
     return { impossible: true, reason: IMPOSSIBLE_EXPLANATION };
   }
 
   const result = calculateCalculatorResult({
     weightKg: weight,
     heightCm: height,
-    renalFunction: renalByValue.get(renalValue)!,
+    renalFunction: values.renal,
     cycles,
   });
 

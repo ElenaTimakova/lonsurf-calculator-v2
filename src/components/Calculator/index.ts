@@ -1,4 +1,5 @@
 export { Calculator } from './Calculator';
+export { getRenalLookupKey, isRenalValue, RENAL_OPTIONS, RENAL_VALUES } from './constants';
 export {
   calculateCalculatorResult,
   computeDose,

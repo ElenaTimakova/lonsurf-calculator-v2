@@ -12,6 +12,8 @@ export const INITIAL_FORM: CalculatorFormValues = {
 export const REQUIRED_MSG = 'Поле обязательно для заполнения';
 export const NUMBER_MSG = 'Введите число, например, 80';
 
+export const RENAL_VALUES = ['normal', 'mild', 'moderate', 'severe'] as const satisfies readonly RenalValue[];
+
 export const RENAL_OPTIONS: Array<{
   value: RenalValue;
   label: string;
@@ -22,6 +24,16 @@ export const RENAL_OPTIONS: Array<{
   { value: 'moderate', label: 'Средняя степень тяжести', excelLabel: 'Средняя степень тяжести' },
   { value: 'severe', label: 'Тяжёлая степень', excelLabel: 'Тяжелая степень ' },
 ];
+
+/** Ключ строки в lookupTable.json (значение renal из Excel, без опечаток в UI). */
+export function getRenalLookupKey(value: RenalValue): string | null {
+  const option = RENAL_OPTIONS.find((item) => item.value === value);
+  return option ? option.excelLabel.trim() : null;
+}
+
+export function isRenalValue(value: string): value is RenalValue {
+  return (RENAL_VALUES as readonly string[]).includes(value);
+}
 
 /** Дней приёма в одном 28-дневном цикле (дни 1–5 и 8–12), по Excel */
 export const TREATMENT_DAYS_PER_CYCLE = 10;

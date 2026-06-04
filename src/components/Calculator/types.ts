@@ -2,7 +2,12 @@ export type RenalValue = 'normal' | 'mild' | 'moderate' | 'severe';
 
 export type CalculatorField = 'weight' | 'height' | 'renal' | 'days';
 
-export type CalculatorFormValues = Record<CalculatorField, string>;
+export type CalculatorFormValues = {
+  weight: string;
+  height: string;
+  renal: RenalValue | '';
+  days: string;
+};
 
 export type CalculatorView = 'initial' | 'success' | 'impossible';
 
@@ -40,7 +45,7 @@ export type CalculatorPackages = {
 export type CalculatorInput = {
   weightKg: number;
   heightCm: number;
-  renalFunction: string;
+  renalFunction: RenalValue;
   cycles: number;
 };
 

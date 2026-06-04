@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BSA_NOT_IN_TABLE_ERROR } from './constants';
+import { BSA_NOT_IN_TABLE_ERROR, IMPOSSIBLE_EXPLANATION } from './constants';
 import {
   calcBsa,
   calculateCalculatorResult,
@@ -9,6 +9,7 @@ import type {
   CalculatorInput,
   CalculatorPackages,
   CalculatorSuccessResult,
+  RenalValue,
 } from './types';
 
 function expectSuccess(
@@ -56,7 +57,7 @@ describe('calculateCalculatorResult', () => {
       {
         weightKg: 47,
         heightCm: 180,
-        renalFunction: 'Норма',
+        renalFunction: 'normal',
         cycles: 1,
       },
       {
@@ -84,7 +85,7 @@ describe('calculateCalculatorResult', () => {
       {
         weightKg: 70,
         heightCm: 170,
-        renalFunction: 'Средняя степень тяжести',
+        renalFunction: 'moderate',
         cycles: 2,
       },
       {
@@ -112,7 +113,7 @@ describe('calculateCalculatorResult', () => {
       {
         weightKg: 95,
         heightCm: 190,
-        renalFunction: 'Тяжелая степень',
+        renalFunction: 'severe',
         cycles: 3,
       },
       {
@@ -140,7 +141,7 @@ describe('calculateCalculatorResult', () => {
       {
         weightKg: 120,
         heightCm: 180,
-        renalFunction: 'Легкая степень тяжести',
+        renalFunction: 'mild',
         cycles: 1,
       },
       {
@@ -168,7 +169,7 @@ describe('calculateCalculatorResult', () => {
       {
         weightKg: 50,
         heightCm: 180,
-        renalFunction: 'Норма',
+        renalFunction: 'normal',
         cycles: 1,
       },
       {
@@ -196,7 +197,7 @@ describe('calculateCalculatorResult', () => {
       {
         weightKg: 80,
         heightCm: 165,
-        renalFunction: 'Легкая степень тяжести',
+        renalFunction: 'mild',
         cycles: 2,
       },
       {
@@ -225,7 +226,7 @@ describe('calculateCalculatorResult', () => {
     const result = calculateCalculatorResult({
       weightKg: 130,
       heightCm: 180,
-      renalFunction: 'Норма',
+      renalFunction: 'normal',
       cycles: 1,
     });
 
@@ -239,7 +240,7 @@ describe('calculateCalculatorResult', () => {
     const result = calculateCalculatorResult({
       weightKg: 15,
       heightCm: 160,
-      renalFunction: 'Норма',
+      renalFunction: 'normal',
       cycles: 1,
     });
 
@@ -251,22 +252,22 @@ describe('calculateCalculatorResult', () => {
     const result = calculateCalculatorResult({
       weightKg: 30,
       heightCm: 120,
-      renalFunction: 'Норма',
+      renalFunction: 'normal',
       cycles: 1,
     });
 
     expect(result).toEqual({ error: BSA_NOT_IN_TABLE_ERROR });
   });
 
-  it('returns error for unknown renal function label', () => {
+  it('returns error for unknown renal value at runtime', () => {
     const result = calculateCalculatorResult({
       weightKg: 70,
       heightCm: 170,
-      renalFunction: 'Неизвестная степень',
+      renalFunction: 'unknown' as RenalValue,
       cycles: 1,
     });
 
-    expect(result).toHaveProperty('error');
+    expect(result).toEqual({ error: IMPOSSIBLE_EXPLANATION });
   });
 });
 

@@ -21,8 +21,6 @@ src/components/Calculator/
   index.ts
 ```
 
-Корневые файлы `Calculator.jsx`, `Calculator.js`, `Calculator.css` — прежний прототип для справки.
-
 ## Подключение на странице лендинга
 
 ```tsx
@@ -32,6 +30,8 @@ export function DosePage() {
   return <Calculator />;
 }
 ```
+
+Калькулятор использует шрифт **Montserrat**. Для корректного отображения на лендинге шрифт должен быть подключён на уровне приложения/страницы.
 
 ## Локальный запуск
 
