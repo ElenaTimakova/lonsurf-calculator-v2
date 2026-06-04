@@ -414,7 +414,7 @@ export function Calculator({ className = '' }: CalculatorProps) {
             <div className="lc__actions">
               <button
                 type="button"
-                className={`lc-btn lc-btn--ghost${isFormLocked ? ' lc-btn--reset-prominent' : ''}`}
+                className={`lc-btn lc-btn--ghost${isFormLocked || anyValue ? ' lc-btn--reset-prominent' : ''}`}
                 onClick={onReset}
                 disabled={!isFormLocked && !anyValue}
               >

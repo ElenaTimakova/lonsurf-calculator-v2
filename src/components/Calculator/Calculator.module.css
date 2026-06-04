@@ -304,8 +304,8 @@
 }
 
 .root :global(.lc-btn--ghost[disabled]) {
-  background: #e5e0d6;
-  color: var(--grey-muted);
+  background: var(--bg-card);
+  color: var(--grey-icon);
   cursor: not-allowed;
 }
 
