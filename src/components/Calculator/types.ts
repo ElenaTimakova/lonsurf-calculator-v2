@@ -7,6 +7,13 @@ export type CalculatorFormValues = {
   height: string;
   renal: RenalValue | '';
   days: string;
+  bevacizumab: boolean;
+};
+
+export type BevacizumabResult = {
+  doseMg: number;
+  cycles: number;
+  phrase: string;
 };
 
 export type CalculatorView = 'initial' | 'success' | 'impossible';
@@ -87,6 +94,7 @@ export type CalculationSuccess = {
   morning: TabletCount;
   evening: TabletCount;
   packs: PackResult[];
+  bevacizumab?: BevacizumabResult;
 };
 
 export type CalculationImpossible = {

@@ -238,6 +238,118 @@
   margin: 2px 0 0;
 }
 
+/* ======= Чекбокс «Добавить Бевацизумаб» ======= */
+.root :global(.lc-checkbox) {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  padding: 6px 0;
+  color: var(--black);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.root :global(.lc-checkbox.is-locked) {
+  cursor: not-allowed;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.root :global(.lc-checkbox__input) {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.root :global(.lc-checkbox__box) {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--grey-line-strong);
+  border-radius: 6px;
+  background: var(--white);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  margin-top: 1px;
+}
+
+.root :global(.lc-checkbox__box svg) {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.root :global(.lc-checkbox:hover .lc-checkbox__box) {
+  border-color: #b5afa3;
+}
+
+.root :global(.lc-checkbox__input:focus-visible + .lc-checkbox__box) {
+  box-shadow: 0 0 0 4px rgba(255, 187, 84, 0.22);
+  border-color: var(--orange);
+}
+
+.root :global(.lc-checkbox__input:checked + .lc-checkbox__box) {
+  background: var(--grad-sun);
+  border-color: var(--orange);
+  color: var(--black);
+}
+
+.root :global(.lc-checkbox.is-locked .lc-checkbox__box) {
+  background: var(--bg-card);
+  border-color: var(--grey-line-strong);
+}
+
+.root :global(.lc-checkbox.is-locked .lc-checkbox__input:checked + .lc-checkbox__box) {
+  background: var(--cream);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.root :global(.lc-checkbox__text) {
+  padding-top: 1px;
+}
+
+/* ======= Блок «Бевацизумаб» в результате ======= */
+.root :global(.lc-section--bevacizumab) {
+  border-top: 1px dashed var(--grey-line-strong);
+  padding-top: 24px;
+}
+
+.root :global(.lc-bevacizumab) {
+  background: var(--bg-card);
+  border-radius: var(--r-card);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.root :global(.lc-bevacizumab__metric) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.root :global(.lc-bevacizumab .lc-metric__num) {
+  font-size: 36px;
+}
+
+.root :global(.lc-bevacizumab__phrase) {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 140%;
+  color: var(--black);
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
 .root :global(.lc__actions) {
   margin-top: 24px;
   display: flex;

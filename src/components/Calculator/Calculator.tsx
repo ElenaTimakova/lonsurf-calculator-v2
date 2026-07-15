@@ -6,6 +6,9 @@ import {
   validateForm,
 } from './calculatorLogic';
 import {
+  BEVACIZUMAB_CHECKBOX_LABEL,
+  BEVACIZUMAB_DOSE_LABEL,
+  BEVACIZUMAB_SECTION_TITLE,
   COURSE_DURATION_LABEL,
   DOSAGE_REGIMEN_NOTE_AFTER,
   DOSAGE_REGIMEN_NOTE_BEFORE,
@@ -233,6 +236,24 @@ function PacksSection({ packs }: { packs: CalculationSuccess['packs'] }) {
   );
 }
 
+function BevacizumabSection({ data }: { data: NonNullable<CalculationSuccess['bevacizumab']> }) {
+  return (
+    <section className="lc-section lc-section--bevacizumab">
+      <h3 className="lc-section__title">{BEVACIZUMAB_SECTION_TITLE}</h3>
+      <div className="lc-bevacizumab">
+        <div className="lc-bevacizumab__metric">
+          <span className="lc-metric__label">{BEVACIZUMAB_DOSE_LABEL}</span>
+          <div className="lc-metric__value">
+            <span className="lc-metric__num">{data.doseMg}</span>
+            <span className="lc-metric__unit">мг</span>
+          </div>
+        </div>
+        <p className="lc-bevacizumab__phrase">{data.phrase}</p>
+      </div>
+    </section>
+  );
+}
+
 function ResultPanel({ result }: { result: CalculationSuccess }) {
   return (
     <div className="lc-result">
@@ -252,6 +273,8 @@ function ResultPanel({ result }: { result: CalculationSuccess }) {
       </Section>
 
       <PacksSection packs={result.packs} />
+
+      {result.bevacizumab && <BevacizumabSection data={result.bevacizumab} />}
     </div>
   );
 }
@@ -265,12 +288,12 @@ export function Calculator({ className = '' }: CalculatorProps) {
   const anyValue = REQUIRED_FIELDS.some((field) => Boolean(values[field]));
   const isFormLocked = view === 'success';
 
-  const setField = <K extends CalculatorField>(name: K) => (value: CalculatorFormValues[K]) => {
+  const setField = <K extends keyof CalculatorFormValues>(name: K) => (value: CalculatorFormValues[K]) => {
     setValues((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
+    if ((errors as Record<string, string | undefined>)[name]) {
       setErrors((prev) => {
         const next = { ...prev };
-        delete next[name];
+        delete next[name as CalculatorField];
         return next;
       });
     }
@@ -403,6 +426,23 @@ export function Calculator({ className = '' }: CalculatorProps) {
                   onBlur={onFieldBlur('days')}
                 />
               </Field>
+
+              <label className={`lc-checkbox${isFormLocked ? ' is-locked' : ''}`}>
+                <input
+                  type="checkbox"
+                  className="lc-checkbox__input"
+                  name="bevacizumab"
+                  checked={values.bevacizumab}
+                  disabled={isFormLocked}
+                  onChange={(e) => setField('bevacizumab')(e.target.checked)}
+                />
+                <span className="lc-checkbox__box" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <polyline points="4 10 8.5 14.5 16 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <span className="lc-checkbox__text">{BEVACIZUMAB_CHECKBOX_LABEL}</span>
+              </label>
             </div>
 
             <p className="lc-form__note">

@@ -1,5 +1,6 @@
 import lookupTable from './lookupTable.json';
 import {
+  BEVACIZUMAB_MG_PER_KG,
   BSA_NOT_IN_TABLE_ERROR,
   getRenalLookupKey,
   IMPOSSIBLE_EXPLANATION,
@@ -11,6 +12,7 @@ import {
   TREATMENT_DAYS_PER_CYCLE,
 } from './constants';
 import type {
+  BevacizumabResult,
   CalculationResult,
   CalculatorField,
   CalculatorFormValues,
@@ -166,6 +168,16 @@ function calcPacksForUi(
   }));
 }
 
+/** Доза бевацизумаба: округл. вес × 5 мг/кг. Фраза зависит от числа циклов. */
+export function computeBevacizumab(weightKg: number, cycles: number): BevacizumabResult {
+  const doseMg = Math.round(weightKg) * BEVACIZUMAB_MG_PER_KG;
+  const phrase =
+    cycles <= 1
+      ? `${doseMg} мг Бевацизумаба в/в в 1 и 15 день цикла терапии`
+      : `${doseMg} мг Бевацизумаба в 1 и 15 день каждого цикла терапии`;
+  return { doseMg, cycles, phrase };
+}
+
 export function computeDose(values: CalculatorFormValues): CalculationResult {
   const weight = parseNumber(values.weight);
   const height = parseNumber(values.height);
@@ -188,7 +200,7 @@ export function computeDose(values: CalculatorFormValues): CalculationResult {
 
   const { tablets } = result;
 
-  return {
+  const success: CalculationResult = {
     impossible: false,
     bsa: result.bsa,
     singleDose: result.singleDose,
@@ -211,6 +223,12 @@ export function computeDose(values: CalculatorFormValues): CalculationResult {
       p20: tablets.evening.tablet20mg,
     }),
   };
+
+  if (values.bevacizumab) {
+    success.bevacizumab = computeBevacizumab(weight, cycles);
+  }
+
+  return success;
 }
 
 export function formatNumber(value: number, digits = 2): string {
