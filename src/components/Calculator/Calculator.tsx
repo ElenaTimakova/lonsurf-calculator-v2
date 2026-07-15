@@ -7,7 +7,6 @@ import {
 } from './calculatorLogic';
 import {
   BEVACIZUMAB_CHECKBOX_LABEL,
-  BEVACIZUMAB_DOSE_LABEL,
   BEVACIZUMAB_SECTION_TITLE,
   COURSE_DURATION_LABEL,
   DOSAGE_REGIMEN_NOTE_AFTER,
@@ -236,19 +235,39 @@ function PacksSection({ packs }: { packs: CalculationSuccess['packs'] }) {
   );
 }
 
+function BevacizumabIcon() {
+  return (
+    <span className="lc-metric__icon" aria-hidden="true">
+      <svg viewBox="0 0 13 15" fill="url(#lc-bev-icon-grad)" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="lc-bev-icon-grad" x1="0" y1="0" x2="13" y2="15" gradientUnits="userSpaceOnUse">
+            <stop offset="0.3069" stopColor="#EB8D00" />
+            <stop offset="0.7991" stopColor="#EDBD13" />
+          </linearGradient>
+        </defs>
+        <path d="M4.55762 0C5.05907 0 5.53073 0.324303 5.68066 0.816406C6.86829 0.947333 7.8457 1.90878 7.8457 3.15039V8.75C7.8457 9.99155 6.86822 10.951 5.68066 11.082C5.57123 11.443 5.289 11.712 4.94824 11.8311C5.14508 12.4846 5.78723 12.9999 6.60938 13C7.6022 13 8.33487 12.2491 8.33496 11.4102C8.33496 10.2611 9.30707 9.40055 10.417 9.40039C11.527 9.40039 12.5 10.261 12.5 11.4102C12.4999 11.8243 12.1642 12.1602 11.75 12.1602C11.3358 12.1602 11.0001 11.8243 11 11.4102C11 11.1676 10.779 10.9004 10.417 10.9004C10.0552 10.9005 9.83496 11.1676 9.83496 11.4102C9.83487 13.1557 8.35025 14.5 6.60938 14.5C5.03555 14.4999 3.67199 13.4011 3.4248 11.9004H3.28809C2.78655 11.9002 2.31471 11.5754 2.16504 11.083C0.977641 10.9519 0 9.99143 0 8.75V3.15039C0 1.9089 0.977564 0.946502 2.16504 0.81543C2.31519 0.32388 2.78704 0.000161712 3.28809 0H4.55762ZM1.25 7.25C0.973858 7.25 0.75 7.47386 0.75 7.75C0.75 8.02614 0.973858 8.25 1.25 8.25H2.25C2.52614 8.25 2.75 8.02614 2.75 7.75C2.75 7.47386 2.52614 7.25 2.25 7.25H1.25ZM1.25 5.75C0.973858 5.75 0.75 5.97386 0.75 6.25C0.75 6.52614 0.973858 6.75 1.25 6.75H2.25C2.52614 6.75 2.75 6.52614 2.75 6.25C2.75 5.97386 2.52614 5.75 2.25 5.75H1.25ZM1.25 4.25C0.973858 4.25 0.75 4.47386 0.75 4.75C0.75 5.02614 0.973858 5.25 1.25 5.25H2.25C2.52614 5.25 2.75 5.02614 2.75 4.75C2.75 4.47386 2.52614 4.25 2.25 4.25H1.25ZM1.25 2.75C0.973858 2.75 0.75 2.97386 0.75 3.25C0.75 3.52614 0.973858 3.75 1.25 3.75H2.25C2.52614 3.75 2.75 3.52614 2.75 3.25C2.75 2.97386 2.52614 2.75 2.25 2.75H1.25Z" />
+      </svg>
+    </span>
+  );
+}
+
 function BevacizumabSection({ data }: { data: NonNullable<CalculationSuccess['bevacizumab']> }) {
+  const scheduleText =
+    data.cycles <= 1
+      ? 'Доза бевацизумаба в 1 и 15 день цикла терапии'
+      : 'Доза бевацизумаба в 1 и 15 день каждого цикла терапии';
   return (
     <section className="lc-section lc-section--bevacizumab">
       <h3 className="lc-section__title">{BEVACIZUMAB_SECTION_TITLE}</h3>
-      <div className="lc-bevacizumab">
-        <div className="lc-bevacizumab__metric">
-          <span className="lc-metric__label">{BEVACIZUMAB_DOSE_LABEL}</span>
-          <div className="lc-metric__value">
-            <span className="lc-metric__num">{data.doseMg}</span>
-            <span className="lc-metric__unit">мг</span>
-          </div>
+      <div className="lc-metric lc-metric--bevacizumab">
+        <div className="lc-metric__head">
+          <span className="lc-metric__label">{scheduleText}</span>
+          <BevacizumabIcon />
         </div>
-        <p className="lc-bevacizumab__phrase">{data.phrase}</p>
+        <div className="lc-metric__value">
+          <span className="lc-metric__num">{data.doseMg}</span>
+          <span className="lc-metric__unit">мг</span>
+        </div>
       </div>
     </section>
   );
