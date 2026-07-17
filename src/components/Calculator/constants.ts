@@ -7,7 +7,13 @@ export const INITIAL_FORM: CalculatorFormValues = {
   height: '',
   renal: '',
   days: '',
+  bevacizumab: false,
 };
+
+export const BEVACIZUMAB_MG_PER_KG = 5;
+export const BEVACIZUMAB_CHECKBOX_LABEL = 'Добавить Бевацизумаб';
+export const BEVACIZUMAB_SECTION_TITLE = 'Бевацизумаб';
+export const BEVACIZUMAB_DOSE_LABEL = 'Доза Бевацизумаба';
 
 export const REQUIRED_MSG = 'Поле обязательно для заполнения';
 export const NUMBER_MSG = 'Введите число, например, 80';
