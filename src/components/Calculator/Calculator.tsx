@@ -254,8 +254,8 @@ function BevacizumabIcon() {
 function BevacizumabSection({ data }: { data: NonNullable<CalculationSuccess['bevacizumab']> }) {
   const scheduleText =
     data.cycles <= 1
-      ? 'Доза бевацизумаба в 1 и 15 день цикла терапии'
-      : 'Доза бевацизумаба в 1 и 15 день каждого цикла терапии';
+      ? 'Доза Бевацизумаба в 1 и 15 день цикла терапии'
+      : 'Доза Бевацизумаба в 1 и 15 день каждого цикла терапии';
   return (
     <section className="lc-section lc-section--bevacizumab">
       <h3 className="lc-section__title">{BEVACIZUMAB_SECTION_TITLE}</h3>
@@ -382,12 +382,12 @@ export function Calculator({ className = '' }: CalculatorProps) {
                   id="weight"
                   name="weight"
                   type="text"
-                  inputMode="decimal"
+                  inputMode="numeric"
                   autoComplete="off"
                   placeholder="Например, 70"
                   value={values.weight}
                   disabled={isFormLocked}
-                  onChange={(e) => setField('weight')(e.target.value)}
+                  onChange={(e) => setField('weight')(e.target.value.replace(/\D/g, ''))}
                   onBlur={onFieldBlur('weight')}
                 />
               </Field>
@@ -398,12 +398,12 @@ export function Calculator({ className = '' }: CalculatorProps) {
                   id="height"
                   name="height"
                   type="text"
-                  inputMode="decimal"
+                  inputMode="numeric"
                   autoComplete="off"
                   placeholder="Например, 180"
                   value={values.height}
                   disabled={isFormLocked}
-                  onChange={(e) => setField('height')(e.target.value)}
+                  onChange={(e) => setField('height')(e.target.value.replace(/\D/g, ''))}
                   onBlur={onFieldBlur('height')}
                 />
               </Field>

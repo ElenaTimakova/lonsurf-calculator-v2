@@ -60,12 +60,10 @@ export function validateField(
   const raw = value.trim();
   if (!raw) return REQUIRED_MSG;
 
-  if (!/^\d+([.,]\d+)?$/.test(raw)) return NUMBER_MSG;
+  if (!/^\d+$/.test(raw)) return NUMBER_MSG;
 
-  const numeric = parseNumber(raw);
-  if (name === 'days' && (!Number.isInteger(numeric) || numeric <= 0)) {
-    return NUMBER_MSG;
-  }
+  const numeric = parseInt(raw, 10);
+  if (name === 'days' && numeric <= 0) return NUMBER_MSG;
 
   return null;
 }
