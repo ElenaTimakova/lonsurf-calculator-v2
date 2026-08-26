@@ -15,7 +15,11 @@ import {
   IMPOSSIBLE_EXPLANATION,
   IMPOSSIBLE_TITLE,
   INITIAL_FORM,
+  LEGAL_DISCLAIMER_AFTER,
+  LEGAL_DISCLAIMER_BEFORE,
+  LEGAL_DISCLAIMER_LINK_TEXT,
   REQUIRED_FIELDS,
+  SMPC_PDF_FILE,
   isRenalValue,
   RENAL_OPTIONS,
 } from './constants';
@@ -252,16 +256,16 @@ function BevacizumabIcon() {
 }
 
 function BevacizumabSection({ data }: { data: NonNullable<CalculationSuccess['bevacizumab']> }) {
-  const scheduleText =
-    data.cycles <= 1
-      ? 'Доза Бевацизумаба в 1 и 15 день цикла терапии'
-      : 'Доза Бевацизумаба в 1 и 15 день каждого цикла терапии';
+  const cyclePhrase = data.cycles <= 1 ? 'цикла терапии' : 'каждого цикла терапии';
   return (
     <section className="lc-section lc-section--bevacizumab">
       <h3 className="lc-section__title">{BEVACIZUMAB_SECTION_TITLE}</h3>
       <div className="lc-metric lc-metric--bevacizumab">
         <div className="lc-metric__head">
-          <span className="lc-metric__label">{scheduleText}</span>
+          <span className="lc-metric__label">
+            Доза Бевацизумаба в каждый из дней:{' '}
+            <span className="lc-nowrap">1-й и 15-й день</span> {cyclePhrase}
+          </span>
           <BevacizumabIcon />
         </div>
         <div className="lc-metric__value">
@@ -493,6 +497,18 @@ export function Calculator({ className = '' }: CalculatorProps) {
           {view === 'initial' && <EmptyState />}
         </div>
       </div>
+
+      <p className="lc-disclaimer">
+        {LEGAL_DISCLAIMER_BEFORE}
+        <a
+          href={`${import.meta.env.BASE_URL}${SMPC_PDF_FILE}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {LEGAL_DISCLAIMER_LINK_TEXT}
+        </a>
+        {LEGAL_DISCLAIMER_AFTER}
+      </p>
     </section>
   );
 }
